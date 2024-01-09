@@ -7,13 +7,15 @@
 
 import SwiftUI
 
-// TODO: Handle iPhone landscape, Dark Mode, iPad, handle insufficient funds better, handle blackjack better, etc.
+// TODO: Better way of doing animation, Dark Mode, iPad, handle iPhone landscape, handle button spamming, handle insufficient funds better, handle blackjack better, etc.
 struct BlackjackGameView: View {
     
     @ObservedObject var blackjackGame: BlackjackGame
     
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
     @Namespace private var splittingNamespace
+    
     @State private var bet: Double = 0
     @State private var insufficientFundsAlert = false
     @State private var finished = false
@@ -160,11 +162,15 @@ struct BlackjackGameView: View {
             HStack {
                 Spacer()
                 Button("Double") {
-                    double()
+                    if blackjackGame.activePlayerHand.state == .none {
+                        double()
+                    }
                 }
                 Spacer()
                 Button("Split") {
-                    split()
+                    if blackjackGame.activePlayerHand.state == .none {
+                        split()
+                    }
                 }
                 Spacer()
             }
@@ -172,11 +178,15 @@ struct BlackjackGameView: View {
             HStack {
                 Spacer()
                 Button("Stand") {
-                    stand()
+                    if blackjackGame.activePlayerHand.state == .none {
+                        stand()
+                    }
                 }
                 Spacer()
                 Button("Hit") {
-                    hit()
+                    if blackjackGame.activePlayerHand.state == .none {
+                        hit()
+                    }
                 }
                 Spacer()
             }
@@ -280,18 +290,18 @@ struct BlackjackGameView: View {
             let delay = flipAndDealDealer()
             var j: CGFloat = 1
             for i in (0..<blackjackGame.playerHands.count).reversed() {
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay + (DrawingConstants.resultDelay * j)) {
+                Timer.scheduledTimer(withTimeInterval: delay + (DrawingConstants.resultDelay * j), repeats: false) { _ in
                     withAnimation(.easeInOut) {
                         blackjackGame.showResult()
                     }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay + (DrawingConstants.resultDelay * (j + 1))) {
+                Timer.scheduledTimer(withTimeInterval: delay + (DrawingConstants.resultDelay * (j + 1)), repeats: false) {_ in
                     withAnimation(.easeInOut) {
                         blackjackGame.resetState()
                     }
                 }
                 if i != 0 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + delay + (DrawingConstants.resultDelay * (j + 2))) {
+                    Timer.scheduledTimer(withTimeInterval: delay + (DrawingConstants.resultDelay * (j + 2)), repeats: false) {_ in
                         withAnimation(.easeInOut) {
                             blackjackGame.switchToPreviousHand()
                         }
@@ -304,12 +314,12 @@ struct BlackjackGameView: View {
             }
         } else {
             let delayMultiplier: CGFloat = delay ? 2 : 0
-            DispatchQueue.main.asyncAfter(deadline: .now() + DrawingConstants.playerDealDelay * delayMultiplier) {
+            Timer.scheduledTimer(withTimeInterval: DrawingConstants.playerDealDelay * delayMultiplier, repeats: false) {_ in
                 withAnimation(.easeInOut) {
                     blackjackGame.switchHand()
                 }
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + DrawingConstants.playerDealDelay * (delayMultiplier + 1)) {
+            Timer.scheduledTimer(withTimeInterval: DrawingConstants.playerDealDelay * (delayMultiplier + 1), repeats: false) {_ in
                 if blackjackGame.activePlayerHand.cards.count < 2 {
                     withAnimation(.easeInOut) {
                         blackjackGame.dealOneToPlayer()

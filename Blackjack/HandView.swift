@@ -33,14 +33,16 @@ struct HandView: View {
                     }
                 }
                 if hand.cards.count > 1 {
-                    Text("\(hand.score())")
-                        .background(
-                            RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
-                                .frame(width: frame(for: geometry.size), height: frame(for: geometry.size))
-                                .foregroundColor(.white)
-                        )
-                        .font(font(in: geometry.size).bold())
-                        .offset(x: scoreOffset(in: geometry.size, for: hand.cards.count - 1))
+                    ZStack {
+                        RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
+                            .foregroundColor(.white)
+                        Text("\(hand.score())")
+                            .font(font(in: geometry.size).bold())
+                    }
+                    .frame(width: frame(for: geometry.size), height: frame(for: geometry.size))
+                    .offset(x: scoreOffset(in: geometry.size, for: hand.cards.count - 1) + frame(for: geometry.size)/3, y: frame(for: geometry.size)/3)
+                    .id(hand.score() + (hand.cards.first?.id ?? hand.cards.count))
+                    .transition(.asymmetric(insertion: .opacity, removal: .identity))
                 }
             }
             .offset(x: -handOffset(in: geometry.size, for: hand.cards.count - 1))
@@ -133,6 +135,7 @@ struct HandView_Previews: PreviewProvider {
         let _ = game.placeBet(50)
         let _ = game.dealOneToPlayer()
         let _ = game.dealOneToPlayer()
-        HandView(namespace: namespace, hand: game.playerHands[0], state: .playerWins)
+        HandView(namespace: namespace, hand: game.playerHands[0], state: .none)
+//            .scaleEffect(0.5)
     }
 }

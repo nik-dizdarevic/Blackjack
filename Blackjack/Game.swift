@@ -20,12 +20,14 @@ struct Game {
     init() {
         deck = []
         var i = 0
-        for suit in Card.Suit.allCases {
-            for rank in Card.Rank.allCases {
-                deck.append(Card(id: i, suit: suit, rank: rank))
-                i += 1
+        for _ in 0...7 {
+            for suit in Card.Suit.allCases {
+                for rank in Card.Rank.allCases {
+                    deck.append(Card(id: i, suit: suit, rank: rank))
+                    i += 1
+                }
             }
-        } 
+        }
         deck.shuffle()
     }
     

@@ -4,6 +4,7 @@ A Blackjack game.
 
 ## Notes 
 
+* MVVM
 * SwiftUI
 
 ## Video Walkthrough
